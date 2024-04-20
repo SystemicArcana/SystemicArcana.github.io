@@ -1,0 +1,27 @@
+body{
+    /*background-color: #583b60;*/
+    background-image: radial-gradient(circle, black 30%, #583b60 90%);
+    text-align: center;
+}
+h1{
+    color: #f1d152;
+    text-align: center;
+    font-family: "orbitron";
+}
+p{
+    color: #ffffff;
+    text-align: center;
+    font-family: "vt323";
+}
+@font-face {
+    font-family: "vt323";
+    src: url("../fonts/VT323.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: "orbitron";
+    src: url("../fonts/orbitron.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
