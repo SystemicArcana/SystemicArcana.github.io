@@ -9,8 +9,12 @@ main();
 function main() {
   const canvas = document.querySelector("#glcanvas");
   // Initialize the GL context
-  const gl = canvas.getContext("webgl");
-
+  const gl = canvas.getContext("webgl",
+  {alpha:true,
+  premultipliedAlpha:false});
+  // Prepare for spinny
+  let squareRotation = 0.0;
+  let deltaTime = 0;
   // Only continue if WebGL is available and working
   if (gl === null) {
     alert(
@@ -19,24 +23,32 @@ function main() {
     return;
   }
 
-  // Set clear color to black, fully opaque
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  // Set clear color
+  gl.clearColor(0, 0, 0, 0);
   // Clear the color buffer with specified clear color
   gl.clear(gl.COLOR_BUFFER_BIT);
 
   // Vertex shader program
   const vsSource = `
-    attribute vec4 aVertexPosition;
-    uniform mat4 uModelViewMatrix;
-    uniform mat4 uProjectionMatrix;
-    void main() {
-      gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
-    }
+  attribute vec4 aVertexPosition;
+  attribute vec4 aVertexColor;
+
+  uniform mat4 uModelViewMatrix;
+  uniform mat4 uProjectionMatrix;
+
+  varying lowp vec4 vColor;
+
+  void main(void) {
+    gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+    vColor = aVertexColor;
+  }
 `;
 
-  const fsSource = `
-    void main() {
-      gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+const fsSource = `
+    varying lowp vec4 vColor;
+
+    void main(void) {
+      gl_FragColor = vColor;
     }
   `;
 
@@ -51,12 +63,10 @@ function main() {
     program: shaderProgram,
     attribLocations: {
       vertexPosition: gl.getAttribLocation(shaderProgram, "aVertexPosition"),
+      vertexColor: gl.getAttribLocation(shaderProgram, "aVertexColor"),
     },
     uniformLocations: {
-      projectionMatrix: gl.getUniformLocation(
-        shaderProgram,
-        "uProjectionMatrix"
-      ),
+      projectionMatrix: gl.getUniformLocation(shaderProgram, "uProjectionMatrix"),
       modelViewMatrix: gl.getUniformLocation(shaderProgram, "uModelViewMatrix"),
     },
   };
@@ -65,8 +75,20 @@ function main() {
   // objects we'll be drawing.
   const buffers = initBuffers(gl);
 
-  // Draw the scene
-  drawScene(gl, programInfo, buffers);
+  let then = 0;
+
+  // Draw the scene repeatedly
+  function render(now) {
+    now *= 0.001; // convert to seconds
+    deltaTime = now - then;
+    then = now;
+  
+    drawScene(gl, programInfo, buffers, squareRotation);
+    squareRotation += deltaTime;
+  
+    requestAnimationFrame(render);
+  }
+  requestAnimationFrame(render);
 }
 
 //
