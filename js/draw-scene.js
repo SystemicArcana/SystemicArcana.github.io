@@ -67,8 +67,8 @@ function drawScene(gl, programInfo, buffers, squareRotation) {
   
     {
       const offset = 0;
-      const vertexCount = 4;
-      gl.drawArrays(gl.TRIANGLE_STRIP, offset, vertexCount);
+      const vertexCount = 18;
+      gl.drawArrays(gl.TRIANGLE_FAN, offset, vertexCount);
     }
   }
   
